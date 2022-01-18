@@ -7,6 +7,9 @@ import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
+
 
 
 //API
@@ -35,6 +38,9 @@ const styles = {
 
 };
 
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 
 class Main extends Component {
@@ -48,13 +54,15 @@ class Main extends Component {
           typingTimeout: 0,
           latestSearch: [],
           sortAZ: true,
-          countrySelected: null
+          countrySelected: null,
+          openNotification: false,
         };
 
         this.onCitiesChanges = this.onCitiesChanges.bind(this);
         this.handlePrefered = this.handlePrefered.bind(this);
         this.sortPrefered = this.sortPrefered.bind(this);
         this.countryFilter = this.countryFilter.bind(this);
+        this.handleClose = this.handleClose.bind(this);
   }
 
   onCitiesChanges = (event, values) => {
@@ -109,6 +117,12 @@ class Main extends Component {
           this.setState({
             prefered: [...this.state.prefered, {...res.data, date: new Date()}],
           })          
+        }).catch((err) => {
+          this.setState({
+            openNotification: true,
+            severity: 'error',  
+            responseMsg: 'Error getting prefered city',
+          }); 
         });
         return true;
       });            
@@ -122,13 +136,25 @@ class Main extends Component {
           cities: res.data.data,
           loading: false,
         })
+      }).catch((err) => {
+        this.setState({
+          openNotification: true,
+          severity: 'error',  
+          responseMsg: 'Error getting searched city',
+        }); 
       });
     }
   }
 
   getPrefCities (){
-    apiPreferedCities.getAll().then((res) => {     
+    apiPreferedCities.getAll().then((res) => {    
       this.getCity(res.data.data);
+    }).catch((err) => {
+      this.setState({
+        openNotification: true,
+        severity: 'error',  
+        responseMsg: 'Error getting prefered cities',
+      }); 
     });
   }
 
@@ -152,6 +178,16 @@ class Main extends Component {
     }
   }
 
+  handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    this.setState({
+      openNotification: false
+    });
+  };
+
   componentDidMount(){
     this.getPrefCities();
   }
@@ -161,7 +197,7 @@ class Main extends Component {
     
   render(){  
     const { classes } = this.props;
-    const { cities, prefered, loading, countrySelected, sortAZ } = this.state;
+    const { cities, prefered, loading, countrySelected, sortAZ, openNotification, responseMsg, severity } = this.state;
 
     return (
       <>
@@ -198,6 +234,11 @@ class Main extends Component {
               </Box>
           </Container>
         </main>
+        <Snackbar open={openNotification} autoHideDuration={6000} onClose={this.handleClose} message="Note archived" anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
+          <Alert onClose={this.handleClose} severity={severity} sx={{ width: '100%' }}>
+            {responseMsg}
+          </Alert>
+        </Snackbar>
       </>
     );
   }
