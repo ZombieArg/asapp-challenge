@@ -8,29 +8,32 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import TextField from '@mui/material/TextField';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
-import clsx from 'clsx';
-import InputAdornment from '@mui/material/InputAdornment';
-import IconButton from '@mui/material/IconButton';
-import Visibility from '@mui/icons-material/Visibility';
 
+import clsx from 'clsx';
 
 import { apiCities } from '../api/cities';
 import { apiPreferedCities } from '../api/preferedCities';
-
-
 
 import Cities from '../components/cities';  
 
 
 const styles = {  
-    root: {
-      backgroundColor: '#FFF',
+    root: {      
+      backgroundColor: '#aae8f5',
       height: '100vh',      
+      background:'url("./img/vakantie.jpeg") no-repeat center -520px #aae8f5',
+      backgroundSize: 'cover',
+    },
+    topSection: {
+      
     },
     textField:{
         backgroundColor: 'transparent',
         width: '100%',
         padding: '10px 5px',
+        "& .MuiOutlinedInput-root":{
+          backgroundColor: '#FFF',
+        }
     },
     autocomplete:{
         width: '100%',
@@ -45,6 +48,9 @@ const styles = {
             border: "2px solid green",
             borderRadius: 4
           }
+        },
+        "& .MuiInputLabel-root":{
+          lineHeight: '45px'
         }
     },
     option: {
@@ -54,10 +60,13 @@ const styles = {
       backgroundColor: 'green',
       color: 'white',
     },
-    paper: {
-      
+    popper: {
+      backgroundColor: 'white',
     }
 };
+
+
+
 class Main extends Component {
   constructor(props) {
         super(props);
@@ -66,7 +75,8 @@ class Main extends Component {
           prefered: [],
           query: undefined,
           typing: false,
-          typingTimeout: 0
+          typingTimeout: 0,
+          latestSearch: [],
         };
   }
 
@@ -80,14 +90,26 @@ class Main extends Component {
     self.setState({
        loading: true,
        typing: false,
-       typingTimeout: setTimeout(function () {         
-          self.getCities(`?filter=${event.target.value}&limit=50&offset=0`);
-       }, 500)
+       typingTimeout: setTimeout(function () {   
+         if(event.target.value !== ''){
+          self.getCities(`?filter=${event.target.value}&limit=35&offset=0`);
+          self.setState({
+            latestSearch: [...self.state.latestSearch, {name: event.target.value, date: new Date()}],
+          });
+         }else{
+          self.setState({
+            cities: [],
+            loading: false,
+          })
+         }               
+       }, 600)
     });
   };
 
   handlePreferred = (e, cityID) => {
     e.preventDefault();
+
+
     //Check if the city is already in the array of preferred cities
     if(!this.state.prefered.find(city => city.geonameid === cityID)){
       this.getCity([cityID]);
@@ -103,24 +125,13 @@ class Main extends Component {
      
   };
 
-  formatCitiesIntoObj = (cities) => {      
-    if (cities) {
-      let prefCitiesObject = cities.map((city) => {
-        return {
-          id: city,
-        };
-      });        
-      
-      return prefCitiesObject;
-    }    
-  };
 
   getCity = (cities) => {      
     if (cities) {
       cities.map((city) => {
         apiCities.getSingle(city).then((res) => { 
           this.setState({
-            prefered: [...this.state.prefered, res.data],
+            prefered: [...this.state.prefered, {...res.data, date: new Date()}],
           })          
         });
         return true;
@@ -146,7 +157,6 @@ class Main extends Component {
   }
 
   componentDidMount(){
-    //this.getCities("?filter='argentina'&limit=50&offset=0");
     this.getPrefCities();
   }
   
@@ -155,14 +165,14 @@ class Main extends Component {
     
   render(){  
     const { classes } = this.props;
-    const { cities, prefered, loading } = this.state;
+    const { cities, prefered, loading, latestSearch } = this.state;
 
     const filterOptions = createFilterOptions({
       matchFrom: "any",
       limit: 50,
     });
 
-    console.log(cities)
+    console.log(latestSearch)
     return (
       <>
         <CssBaseline />
@@ -173,8 +183,9 @@ class Main extends Component {
               pt: 8,
               pb: 6,
             }}
+            className={classes.topSection}
           >
-            <Container maxWidth="sm">
+            <Container maxWidth="sm" >
               <Typography
                 component="h1"
                 variant="h2"
@@ -184,11 +195,14 @@ class Main extends Component {
               >
                 <img src="./img/logo.webp" alt="ASAPP" />
               </Typography>
-              <Typography variant="h5" align="center" color="#000" paragraph>
+              <Typography variant="h3" align="center" color="#FFF" paragraph>
                 This app will help you plan your next trip.
               </Typography>
+              <Typography variant="body1" align="center" color="#FFF" paragraph>
+                Search and save your favourite cities
+              </Typography>
               <Stack
-                sx={{ pt: 4 }}
+                sx={{ pt: 4, position: 'relative' }}
                 direction="row"
                 spacing={2}
                 justifyContent="center"
@@ -197,13 +211,12 @@ class Main extends Component {
                     options={cities}
                     getOptionLabel={(option) => option.name}
                     id="disable-close-on-select"
+                    disablePortal
                     disableCloseOnSelect
                     onInputChange={(event, newInputValue) => {
                       console.log("onchangeinput")
                       this.onCitiesChanges(event, newInputValue);
                     }}
-                    groupBy={(option) => option.country.name}
-                    filterOptions={filterOptions}
                     noOptionsText="We couldn't find any city with that name"
                     renderOption={(props, option) => {
                       //Check if the option is present in the prefered cities array and return true if it is           
@@ -218,7 +231,7 @@ class Main extends Component {
                           }}
                           className={clsx(classes.option, {[classes.optionSelected]:isPresent})}
                         >
-                          <Box p={1} >
+                          <Box p={1}>
                             <Typography variant="body1">
                               {option.name}
                             </Typography>
@@ -245,7 +258,10 @@ class Main extends Component {
               </Stack>
             </Container>
           </Box>
-          <Container sx={{ py: 8 }} maxWidth="md">            
+          <Container sx={{ py: 8 }} maxWidth="md">     
+              <Typography variant="h5" align="center" color="#FFF" elevation={3} paragraph>
+                My favourite cities
+              </Typography>       
             {prefered && (<Cities prefered={prefered} removeCity={this.handlePreferred}  />)}        
           </Container>
         </main>

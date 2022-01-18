@@ -37,9 +37,10 @@ function City(props) {
 
 function Cities(props){
   const {prefered, removeCity} = props
+  var sorted_prefered = prefered.sort((a, b) => a.name.localeCompare(b.name))
     return (
       <Grid container spacing={4}>
-        {prefered.map((city) => (
+        {sorted_prefered.map((city) => (
           <Grid item key={city.geonameid} xs={12} sm={6} md={4}>
             <City removeCity={removeCity} {...city} />
           </Grid>
