@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 
+//MUI
 import { withStyles } from '@mui/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Stack from '@mui/material/Stack';
@@ -7,25 +8,26 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import TextField from '@mui/material/TextField';
-import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
+import Autocomplete from '@mui/material/Autocomplete';
 
+//Utility
 import clsx from 'clsx';
 
+//API
 import { apiCities } from '../api/cities';
 import { apiPreferedCities } from '../api/preferedCities';
 
+//Components
 import Cities from '../components/cities';  
+import Filters from '../components/filters';
 
 
 const styles = {  
     root: {      
       backgroundColor: '#aae8f5',
-      height: '100vh',      
+      height: '100%',      
       background:'url("./img/vakantie.jpeg") no-repeat center -520px #aae8f5',
       backgroundSize: 'cover',
-    },
-    topSection: {
-      
     },
     textField:{
         backgroundColor: 'transparent',
@@ -33,12 +35,15 @@ const styles = {
         padding: '10px 5px',
         "& .MuiOutlinedInput-root":{
           backgroundColor: '#FFF',
+          outlineColor: "#000"
+        },
+        "& .MuiInputLabel-root": {
+          color: "#000"
         }
     },
     autocomplete:{
         width: '100%',
         "& .MuiAutocomplete-listbox": {
-          border: "2px solid yellow",
           minHeight: 400,
           color: "green",
           fontSize: 18,
@@ -51,13 +56,21 @@ const styles = {
         },
         "& .MuiInputLabel-root":{
           lineHeight: '45px'
-        }
+        },
     },
     option: {
       cursor: 'pointer',
+      '&[data-focus="true"]': {
+        backgroundColor: '#F8F8F8',
+        borderColor: 'transparent',
+      },
+      "&:hover":{
+        backgroundColor: '#c0c0c0',
+        color: 'white',
+      }
     },
     optionSelected: {
-      backgroundColor: 'green',
+      backgroundColor: '#ccc',
       color: 'white',
     },
     popper: {
@@ -77,7 +90,12 @@ class Main extends Component {
           typing: false,
           typingTimeout: 0,
           latestSearch: [],
+          sortAZ: true,
+          countrySelected: null
         };
+
+        this.sortPrefered = this.sortPrefered.bind(this);
+        this.countryFilter = this.countryFilter.bind(this);
   }
 
   onCitiesChanges = (event, values) => {
@@ -108,7 +126,6 @@ class Main extends Component {
 
   handlePreferred = (e, cityID) => {
     e.preventDefault();
-
 
     //Check if the city is already in the array of preferred cities
     if(!this.state.prefered.find(city => city.geonameid === cityID)){
@@ -156,6 +173,26 @@ class Main extends Component {
     });
   }
 
+  sortPrefered (value){    
+    this.setState({
+      sortAZ: value
+    })
+  }
+
+  countryFilter (value){    
+    console.log(value);
+    console.log(this.state.countrySelected);
+    if(value !== this.state.countrySelected){
+      this.setState({
+        countrySelected: value
+      })
+    }else{
+      this.setState({
+        countrySelected: null
+      })
+    }
+  }
+
   componentDidMount(){
     this.getPrefCities();
   }
@@ -165,38 +202,20 @@ class Main extends Component {
     
   render(){  
     const { classes } = this.props;
-    const { cities, prefered, loading, latestSearch } = this.state;
+    const { cities, prefered, loading, countrySelected, sortAZ } = this.state;
 
-    const filterOptions = createFilterOptions({
-      matchFrom: "any",
-      limit: 50,
-    });
-
-    console.log(latestSearch)
     return (
       <>
         <CssBaseline />
         <main className={classes.root}>
           {/* Hero unit */}
-          <Box
-            sx={{
-              pt: 8,
-              pb: 6,
-            }}
-            className={classes.topSection}
-          >
+          <Box sx={{pt: 8, pb: 6,}} className={classes.topSection} >
             <Container maxWidth="sm" >
-              <Typography
-                component="h1"
-                variant="h2"
-                align="center"
-                color="#000"
-                gutterBottom
-              >
+              <Typography component="h1" variant="h2" align="center" color="#000" gutterBottom>
                 <img src="./img/logo.webp" alt="ASAPP" />
               </Typography>
               <Typography variant="h3" align="center" color="#FFF" paragraph>
-                This app will help you plan your next trip.
+                This app will help you plan your next trip
               </Typography>
               <Typography variant="body1" align="center" color="#FFF" paragraph>
                 Search and save your favourite cities
@@ -248,7 +267,7 @@ class Main extends Component {
                       <TextField
                         {...params}
                         label="Select your prefered cities"
-                        className={classes.textField}                     
+                        className={classes.textField}                
                       />
                     )}
                     loading={loading}         
@@ -259,10 +278,15 @@ class Main extends Component {
             </Container>
           </Box>
           <Container sx={{ py: 8 }} maxWidth="md">     
-              <Typography variant="h5" align="center" color="#FFF" elevation={3} paragraph>
+              <Typography variant="h5" align="center" color="#000" mb={3} paragraph>
                 My favourite cities
               </Typography>       
-            {prefered && (<Cities prefered={prefered} removeCity={this.handlePreferred}  />)}        
+              <Box mb={3}>
+                 <Filters sortPrefered={this.sortPrefered} sortAZ={sortAZ} prefered={prefered} countryFilter={this.countryFilter} countrySelected={countrySelected}/>
+              </Box>
+              <Box spacing={2}>
+                 {prefered && (<Cities prefered={prefered} removeCity={this.handlePreferred} sortAZ={sortAZ} countrySelected={countrySelected}/>)}        
+              </Box>
           </Container>
         </main>
       </>

@@ -1,44 +1,57 @@
 
 import React from 'react';
 
-
-import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
 import Grid from '@mui/material/Grid';
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
-import Skeleton from '@mui/material/Skeleton';
-import Stack from '@mui/material/Stack';
 
-function City(props) {
-    const {country, name, subcountry, geonameid, removeCity} = props; 
-    
-    return (
+import City from './city';
 
-      <Card sx={{ height: "100%", display: "flex", flexDirection: "column" }} elevation={2}>
-        <CardContent sx={{ flexGrow: 1 }}>
-          <Typography gutterBottom variant="h5" component="h2">
-            {name ? name : <Skeleton variant="text" />}
-          </Typography>
-          <Stack direction="row" spacing={1}>
-            <Typography>            
-                {country ? country : <Skeleton variant="text" width={40 } />} - {subcountry ? subcountry : <Skeleton variant="text"  width={40}/> }            
-            </Typography>
-          </Stack>
-        </CardContent>
-        <CardActions>          
-          <Button size="small" onClick={(e) => {removeCity(e, geonameid)}}>Remove</Button>
-        </CardActions>
-      </Card>
-    );
+
+const sortCities = (cities, sortAZ) => {
+  if(cities.length > 0){
+    if(sortAZ){
+        //If sortAZ is true, sort the array from A to Z
+        cities.sort((a, b) => {
+          if (a.name < b.name) { return -1; }
+          if (a.name > b.name) { return 1; }
+          return 0;
+        });
+    } else {
+        //If sortAZ is false, sort the array from Z to A
+        cities.sort((a, b) => {
+          if (a.name > b.name) { return -1; }
+          if (a.name < b.name) { return 1; }
+          return 0;
+        });
+    }
+  }
+  return cities;
+}
+
+// filter the cities array by country value
+const filterByCountry = (cities, country) => {
+  if(cities.length > 0){
+    if(country){
+        //If country is true, filter the array by country value
+        cities = cities.filter(city => city.country === country);
+    } else {
+        //If country is false, filter the array by country value
+        cities = cities.filter(city => city.country !== country);
+    }
+  }
+  return cities;
 }
 
 
+
 function Cities(props){
-  const {prefered, removeCity} = props
-  var sorted_prefered = prefered.sort((a, b) => a.name.localeCompare(b.name))
-    return (
+  const {prefered, removeCity, sortAZ, countrySelected} = props;
+
+  let sorted_prefered = filterByCountry(prefered, countrySelected);
+
+  sorted_prefered = sortCities(sorted_prefered, sortAZ);
+
+  
+  return (
       <Grid container spacing={4}>
         {sorted_prefered.map((city) => (
           <Grid item key={city.geonameid} xs={12} sm={6} md={4}>
