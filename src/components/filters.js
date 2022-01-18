@@ -50,13 +50,13 @@ function Filters(props) {
                         {props.prefered && (    
                             Object.keys(groupedCities).map((key, index) => {
                                 return (                                              
-                                    <Chip key={index} avatar={<CustomAvatar qty={groupedCities[key].length} />} label={key} variant="outlined" sx={{ color: "#000", borderColor: "#ccc", marginBottom: '10px' }} onClick={(e) =>{props.countryFilter(key)}} className={clsx({[classes.selected]: countrySelected === key})}/>                                
+                                    <Chip key={index} avatar={<CustomAvatar qty={groupedCities[key].length} />} label={key} variant="outlined" sx={{ color: "#000", borderColor: "#ccc", marginBottom: '10px', marginRight: '10px' }} onClick={(e) =>{props.countryFilter(key)}} className={clsx({[classes.selected]: countrySelected === key})}/>                                
                                 )                                                                        
                             })
                         )}                               
                 </Grid>
                 <Grid item xs={12} sm={6} md={1} align="center" >
-                    <Box sx={{ alignItems: 'center' }}>
+                    <Box sx={{ alignItems: 'center', justifyContent: 'center', height: '100%' }}>
                         <SortByAlphaIcon  title="Sort Alphabetically" alt="Sort Alphabetically" sx={{ color: "#000", cursor: "pointer" }} onClick={(e) => {props.sortPrefered(!sortAZ)}}/>
                     </Box>
                 </Grid>

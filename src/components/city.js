@@ -14,7 +14,7 @@ function City(props) {
     
     return (
 
-      <Card sx={{ height: "100%", display: "flex", flexDirection: "column" }} elevation={2} >
+      <Card sx={{ height: "100%", display: "flex", flexDirection: "column" }} elevation={3} >
         <CardContent sx={{ flexGrow: 1 }}>
           <Typography gutterBottom variant="h5" component="h2">
             {name ? name : <Skeleton variant="text" />}
@@ -26,7 +26,7 @@ function City(props) {
           </Stack>
         </CardContent>
         <CardActions>   
-          <Button variant="contained" size="medium" onClick={(e) => {removeCity(e, geonameid)}} startIcon={<DeleteIcon fontSize="small"/>} sx={{ lineHeight : "26px" }}>Remove</Button>
+          <Button  size="medium" onClick={(e) => {removeCity(e, geonameid)}} startIcon={<DeleteIcon fontSize="small"/>} sx={{ lineHeight : "26px" }}>Remove</Button>
         </CardActions>
       </Card>
     );

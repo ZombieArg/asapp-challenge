@@ -29,7 +29,7 @@ const sortCities = (cities, sortAZ) => {
 
 // filter the cities array by country value
 const filterByCountry = (cities, country) => {
-  if(cities.length > 0){
+  if(cities.length >= 1){
     if(country){
         //If country is true, filter the array by country value
         cities = cities.filter(city => city.country === country);
