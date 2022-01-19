@@ -28,8 +28,11 @@ const styles = {
       height: '100%',            
     },
     topSection: {
-      background:'url("./img/travel-planning-tips-1920x1280.jpeg") no-repeat center -150px transparent',
+      background:'url("./img/travel-planning-tips-1920x1280.jpeg") no-repeat center center transparent',
       backgroundSize: 'cover',
+      ['@media (min-width:1024px)']: { // eslint-disable-line no-useless-computed-key
+        backgroundPosition: 'center -150px',
+      }
     },
     bg: {
       backgroundColor: '#0000007d',
@@ -72,13 +75,13 @@ class Main extends Component {
        clearTimeout(self.state.typingTimeout);
     }
 
-    self.setState({
-       loading: true,
+    self.setState({       
        typing: false,
        typingTimeout: setTimeout(function () {   
          if(event.target.value !== ''){
           self.getCities(`?filter=${event.target.value}&limit=35&offset=0`);
           self.setState({
+            loading: true,
             latestSearch: [...self.state.latestSearch, {name: event.target.value, date: new Date()}],
           });
          }else{
@@ -234,7 +237,7 @@ class Main extends Component {
               </Box>
           </Container>
         </main>
-        <Snackbar open={openNotification} autoHideDuration={6000} onClose={this.handleClose} message="Note archived" anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
+        <Snackbar open={openNotification} autoHideDuration={6000} onClose={this.handleClose} message="Note archived" anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>          
           <Alert onClose={this.handleClose} severity={severity} sx={{ width: '100%' }}>
             {responseMsg}
           </Alert>

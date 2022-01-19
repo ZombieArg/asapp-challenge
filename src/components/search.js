@@ -6,6 +6,11 @@ import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
+import DeleteIcon from '@mui/icons-material/Delete';
+import Button from '@mui/material/Button';
+import CircularProgress from '@mui/material/CircularProgress';
+
+
 
 import clsx from 'clsx';
 
@@ -55,13 +60,13 @@ const searchStyles = makeStyles( theme => ({
         borderColor: 'transparent',
       },
       "&:hover":{
-        backgroundColor: '#c0c0c0',
-        color: 'white',
+        backgroundColor: '#F2F2F2',
+        color: '#4F4F4F',
       }
     },
     optionSelected: {
-      backgroundColor: '#ccc',
-      color: 'white',
+      backgroundColor: '#F2F2F2',
+      color: '#4F4F4F',
     },
     popper: {
       backgroundColor: 'white',
@@ -97,14 +102,24 @@ function Search(props){
                           className={clsx(classes.option, {[classes.optionSelected]:isPresent})}
                         >
                           <Box p={1}>
-                            <Typography variant="body1">
-                              {option.name}
-                            </Typography>
-                            <Stack direction="row" spacing={1}>
-                              <Typography variant="caption">
-                                {option.country} - {option.subcountry}
-                              </Typography>
-                            </Stack>
+                            <Box sx={{display: 'flex', alignItem: 'center', justifyContent:'space-between'}}>
+                              <Stack direction="column" spacing={1}>
+                                <Typography variant="body1">
+                                  {option.name}
+                                </Typography>
+                                <Stack direction="row" spacing={1}>
+                                  <Typography variant="caption">
+                                    {option.country} - {option.subcountry}
+                                  </Typography>
+                                </Stack>
+                              </Stack>
+                              
+                              {isPresent && (
+                                <Button align="end"  size="medium" onClick={(e) => {handlePrefered(e, option.geonameid)}}>
+                                  <DeleteIcon fontSize="small"/>
+                                </Button>
+                              )}                             
+                            </Box>
                           </Box>
                         </li>
                       );
@@ -113,11 +128,15 @@ function Search(props){
                       <TextField
                         {...params}
                         label="Select your prefered cities"
-                        className={classes.textField}                
+                        className={classes.textField}          
                       />
                     )}
                     loading={loading}         
-                    loadingText="Loading..."
+                    loadingText={loading && (
+                      <Box sx={{ display: 'flex' }} size="small">
+                        <CircularProgress />
+                      </Box>
+                    )}
                     className={classes.autocomplete}
                   />
     )

@@ -46,7 +46,7 @@ function Filters(props) {
     return (
         <Box>
             <Grid container>
-                <Grid item xs={12} sm={6} md={11}>                    
+                <Grid item xs={12} sm={11} md={11}>                    
                         {props.prefered && (    
                             Object.keys(groupedCities).map((key, index) => {
                                 return (                                              
@@ -55,7 +55,7 @@ function Filters(props) {
                             })
                         )}                               
                 </Grid>
-                <Grid item xs={12} sm={6} md={1} align="center" >
+                <Grid item xs={12} sm={1} md={1} align="end" >
                     <Box sx={{ alignItems: 'center', justifyContent: 'center', height: '100%' }}>
                         <SortByAlphaIcon  title="Sort Alphabetically" alt="Sort Alphabetically" sx={{ color: "#000", cursor: "pointer" }} onClick={(e) => {props.sortPrefered(!sortAZ)}}/>
                     </Box>
