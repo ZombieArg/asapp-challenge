@@ -24,5 +24,6 @@ Asapp coding challenge
 - User is able to remove favourites from the list and also from the search field. 
 - Added BG and text to help user to understand the functionality of this site.
 - Error msg when the api fails and user cannot find a city in the search field.
+- Added an spinner has searched a city and is waiting for the system response 
 
 

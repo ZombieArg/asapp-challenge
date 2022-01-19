@@ -86,7 +86,6 @@ class Main extends Component {
           });
          }else{
           self.setState({
-            cities: [],
             loading: false,
           })
          }               
